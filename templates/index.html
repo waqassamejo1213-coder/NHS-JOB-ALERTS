@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Career Pro Jobs</title>
+<meta name="description" content="NHS job alerts and an AI-assisted supporting statement writer for international medical graduates, from Career Pro.">
+<meta name="theme-color" content="#144a52">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="icon" href="/static/icon-192.png">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<style>
+  :root{
+    --ink:#152435; --ink-soft:#4b5c70; --line:#dbe2e8; --line-soft:#e9eef2;
+    --ground:#f5f7f9; --surface:#ffffff;
+    --brand:#144a52; --brand-strong:#0d363c; --brand-tint:#e3edee;
+    --accent:#c8873a; --accent-tint:#f7ecdc;
+    --good:#2f7a4f; --good-tint:#e5f3ea;
+    --warn:#b8542a; --warn-tint:#fbe9de;
+    --shadow: 0 1px 2px rgba(21,36,53,.06), 0 8px 24px -12px rgba(21,36,53,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#eaeff2; --ink-soft:#a9b8c4; --line:#2b3a44; --line-soft:#233039;
+      --ground:#0f1a1f; --surface:#152227;
+      --brand:#5fa8a8; --brand-strong:#7ec4c2; --brand-tint:#1b3236;
+      --accent:#e0a25c; --accent-tint:#2c2416;
+      --good:#6fbf8b; --good-tint:#173425;
+      --warn:#e08a5c; --warn-tint:#33231a;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#eaeff2; --ink-soft:#a9b8c4; --line:#2b3a44; --line-soft:#233039;
+    --ground:#0f1a1f; --surface:#152227;
+    --brand:#5fa8a8; --brand-strong:#7ec4c2; --brand-tint:#1b3236;
+    --accent:#e0a25c; --accent-tint:#2c2416;
+    --good:#6fbf8b; --good-tint:#173425;
+    --warn:#e08a5c; --warn-tint:#33231a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"Source Sans 3",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  h1,h2,h3{font-family:"Fraunces","Iowan Old Style",Georgia,serif; font-weight:600; margin:0; text-wrap:balance;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace; font-variant-numeric:tabular-nums;}
+  button,input,select,textarea{font-family:inherit;}
+  a{color:inherit;}
+
+  .topbar{border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:env(safe-area-inset-top,0px); z-index:20;}
+  .topbar-inner{max-width:1180px; margin:0 auto; padding:14px 16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .brand{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .brand-mark{width:34px; height:34px; border-radius:9px; background:linear-gradient(155deg,var(--brand),var(--brand-strong)); display:flex; align-items:center; justify-content:center; color:#fff; font-family:"Fraunces",serif; font-weight:700; font-size:16px; flex-shrink:0;}
+  .brand-text{display:flex; flex-direction:column; line-height:1.15;}
+  .brand-text b{font-family:"Fraunces",serif; font-size:16.5px; font-weight:600;}
+  .brand-text span{font-size:11.5px; color:var(--ink-soft); letter-spacing:.02em;}
+
+  .maintabs{display:flex; gap:4px; margin-left:auto;}
+  .maintab{border:1px solid var(--line); background:var(--surface); color:var(--ink-soft); font-weight:600; font-size:13px; padding:8px 14px; border-radius:9px; cursor:pointer;}
+  .maintab.active{background:var(--brand); border-color:var(--brand); color:#fff;}
+  #install-btn{display:none; flex-shrink:0; border:none; border-radius:9px; padding:9px 14px; background:var(--accent); color:#241505; font-weight:600; font-size:13px; cursor:pointer;}
+
+  .searchbar{flex:1 1 260px; display:flex; align-items:center; gap:8px; background:var(--ground); border:1px solid var(--line); border-radius:10px; padding:9px 12px; min-width:200px;}
+  .searchbar svg{flex-shrink:0; opacity:.55;}
+  .searchbar input{border:none; background:transparent; outline:none; color:var(--ink); font-size:14px; width:100%;}
+  .searchbar input::placeholder{color:var(--ink-soft);}
+
+  .subbar{max-width:1180px; margin:0 auto; padding:10px 16px 12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .chip{display:flex; align-items:center; gap:6px; border:1px solid var(--line); background:var(--surface); border-radius:20px; padding:6px 12px; font-size:13px; color:var(--ink-soft); cursor:pointer;}
+  .chip b{color:var(--ink); font-weight:600;}
+  .chip.active{border-color:var(--brand); color:var(--brand-strong); background:var(--brand-tint);}
+  .subbar .count{margin-left:auto; font-size:12.5px; color:var(--ink-soft);}
+  .subbar select{border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:20px; padding:6px 10px; font-size:13px;}
+  .save-search-btn{border:none; border-radius:20px; padding:7px 14px; background:var(--accent-tint); color:var(--accent); font-weight:600; font-size:13px; cursor:pointer;}
+
+  .layout{display:grid; grid-template-columns: 380px 1fr; gap:18px; padding:6px 16px 40px; max-width:1180px; margin:0 auto; align-items:start;}
+  .col-list{display:flex; flex-direction:column; gap:10px; max-height:calc(100vh - 150px); overflow:auto; padding-right:2px;}
+  .col-detail{position:sticky; top:calc(64px + env(safe-area-inset-top,0px));}
+
+  .job-card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 14px 12px; cursor:pointer; transition:border-color .12s, box-shadow .12s;}
+  .job-card:hover{border-color:var(--brand);}
+  .job-card.selected{border-color:var(--brand); box-shadow:0 0 0 1px var(--brand) inset;}
+  .job-card-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+  .job-title{font-size:15px; font-weight:600; line-height:1.32;}
+  .job-card .trust{color:var(--ink-soft); font-size:13px; margin-top:3px;}
+  .job-card .loc{color:var(--ink-soft); font-size:12.5px; margin-top:6px; display:flex; gap:6px; align-items:center;}
+  .badge{flex-shrink:0; font-size:10.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:3px 7px; border-radius:6px;}
+  .badge.new{background:var(--good-tint); color:var(--good);}
+  .badge.closing{background:var(--warn-tint); color:var(--warn);}
+  .job-card-foot{display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px solid var(--line-soft); font-size:12px; color:var(--ink-soft);}
+
+  .detail{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; box-shadow:var(--shadow);}
+  .detail-head{padding:20px 22px 16px; border-bottom:1px solid var(--line);}
+  .detail-head .eyebrow{font-size:12px; color:var(--ink-soft); display:flex; gap:8px; align-items:center; margin-bottom:8px;}
+  .detail-head h2{font-size:22px; line-height:1.25;}
+  .detail-head .meta{display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; font-size:13px; color:var(--ink-soft);}
+  .detail-head .meta span{display:flex; align-items:center; gap:6px;}
+  .detail-actions{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;}
+  .btn-primary{background:var(--brand); color:#fff; border:none; border-radius:9px; padding:10px 16px; font-weight:600; font-size:13.5px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center;}
+  .btn-ghost{background:transparent; color:var(--brand-strong); border:1px solid var(--line); border-radius:9px; padding:10px 16px; font-weight:600; font-size:13.5px; cursor:pointer;}
+  .btn-ghost.ai{border-color:var(--accent); color:var(--accent); display:flex; align-items:center; gap:6px;}
+  .tab-panel{padding:20px 22px 26px; font-size:14.5px; line-height:1.65; color:var(--ink);}
+  .tab-panel h4{font-family:"Fraunces",serif; font-size:15px; margin:0 0 8px; font-weight:600;}
+  .tab-panel p{margin:0 0 14px; color:var(--ink-soft);}
+  .note{font-size:12.5px; color:var(--ink-soft); background:var(--ground); border:1px solid var(--line); border-radius:9px; padding:10px 12px;}
+
+  .empty-state{padding:60px 22px; text-align:center; color:var(--ink-soft); font-size:14px; line-height:1.6;}
+  .empty-state code{background:var(--brand-tint); color:var(--brand-strong); padding:2px 6px; border-radius:5px; font-size:12.5px;}
+
+  /* ---------- AI writer tab ---------- */
+  .writer{max-width:760px; margin:0 auto; padding:24px 16px 60px;}
+  .writer h2{font-size:22px; margin-bottom:6px;}
+  .writer > p.lede{color:var(--ink-soft); margin:0 0 22px; font-size:14.5px;}
+  .field{display:flex; flex-direction:column; gap:6px; margin-bottom:16px;}
+  .field label{font-size:13px; font-weight:600; color:var(--ink);}
+  .field .hint{font-size:12px; color:var(--ink-soft); font-weight:400;}
+  .field textarea, .field input, .field select{
+    border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-size:14px;
+    background:var(--surface); color:var(--ink); resize:vertical;
+  }
+  .field textarea{min-height:96px; line-height:1.5;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .writer-actions{display:flex; align-items:center; gap:12px; margin-top:6px;}
+  .draft-out{margin-top:24px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px; white-space:pre-wrap; font-size:14.5px; line-height:1.7; display:none;}
+  .draft-out.error{border-color:var(--warn); background:var(--warn-tint); color:var(--warn); white-space:normal;}
+  .spinner{width:15px; height:15px; border-radius:50%; border:2px solid var(--brand-tint); border-top-color:var(--brand); animation:spin .7s linear infinite; display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- alert modal ---------- */
+  .modal-backdrop{position:fixed; inset:0; background:rgba(15,26,31,.5); display:none; align-items:center; justify-content:center; z-index:50; padding:16px;}
+  .modal-backdrop.open{display:flex;}
+  .modal{background:var(--surface); border-radius:14px; max-width:420px; width:100%; padding:22px; box-shadow:var(--shadow);}
+  .modal h3{font-size:17px; margin-bottom:4px;}
+  .modal p{color:var(--ink-soft); font-size:13.5px; margin:0 0 16px;}
+  .modal .field{margin-bottom:12px;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:6px;}
+  .modal-status{font-size:13px; margin-top:10px; display:none;}
+  .modal-status.ok{color:var(--good);}
+  .modal-status.err{color:var(--warn);}
+
+  .back-btn{display:none;}
+  @media (max-width: 860px){
+    .layout{grid-template-columns:1fr; padding-inline:14px;}
+    .col-list{max-height:none; overflow:visible;}
+    .col-detail{position:static;}
+    body[data-view="list"] .col-detail{display:none;}
+    body[data-view="detail"] .col-list{display:none;}
+    .back-btn{display:flex; align-items:center; gap:6px; background:none; border:none; color:var(--brand-strong); font-weight:600; font-size:13.5px; cursor:pointer; padding:14px 14px 0; margin:0;}
+    .searchbar{order:3; flex-basis:100%;}
+    .row2{grid-template-columns:1fr;}
+  }
+  @media (min-width:861px){
+    body[data-view] .col-list, body[data-view] .col-detail{display:flex;}
+    .col-detail{display:block;}
+  }
+  [hidden]{display:none !important;}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">CP</div>
+      <div class="brand-text"><b>Career Pro Jobs</b><span>NHS roles for IMGs</span></div>
+    </div>
+    <div class="searchbar" id="jobs-search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" placeholder="Search by title, trust, or location…" />
+    </div>
+    <div class="maintabs">
+      <button class="maintab active" data-main="jobs">Job alerts</button>
+      <button class="maintab" data-main="writer">Statement writer</button>
+    </div>
+    <button id="install-btn">Install app</button>
+  </div>
+  <div class="subbar" id="jobs-subbar">
+    <select id="grade-filter"><option value="">Grade: Any</option></select>
+    <div class="chip active" id="sort-new"><b>Newest</b></div>
+    <div class="chip" id="sort-deadline">Deadline soonest</div>
+    <button class="save-search-btn" id="open-alert-modal">＋ Save this search as an email alert</button>
+    <div class="count" id="result-count">Loading…</div>
+  </div>
+</div>
+
+<!-- ===== Job alerts view ===== -->
+<div class="layout" id="jobs-view">
+  <div class="col-list" id="job-list"></div>
+  <div class="col-detail">
+    <button class="back-btn" id="back-btn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 18-6-6 6-6"/></svg>
+      Back to list
+    </button>
+    <div id="detail-slot"></div>
+  </div>
+</div>
+
+<!-- ===== Statement writer view ===== -->
+<div class="writer" id="writer-view" hidden>
+  <h2>AI supporting statement writer</h2>
+  <p class="lede">Paste the job advert and your Trac application content below. The draft is written by our server using your real, specific experience — it won't invent qualifications or outcomes you haven't given it, and you should review and edit it before submitting.</p>
+
+  <div class="field">
+    <label>Job advert / job description <span class="hint">— paste from the listing page</span></label>
+    <textarea id="f-advert" placeholder="Paste the full job advert text here…"></textarea>
+  </div>
+  <div class="field">
+    <label>Person specification <span class="hint">— optional, improves accuracy</span></label>
+    <textarea id="f-spec" placeholder="Paste the essential/desirable criteria if listed separately…"></textarea>
+  </div>
+  <div class="field">
+    <label>Your Trac application content <span class="hint">— work history, training, qualifications as entered on your application</span></label>
+    <textarea id="f-tracapp" placeholder="Paste relevant sections of your Trac application…"></textarea>
+  </div>
+  <div class="field">
+    <label>Additional notes <span class="hint">— anything else worth including</span></label>
+    <textarea id="f-experience" placeholder="e.g. a specific audit, procedure count, or achievement to highlight…" style="min-height:64px;"></textarea>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>Target length</label>
+      <select id="f-length">
+        <option value="">Default (≈400–600 words)</option>
+        <option value="short, around 300 words">Short (≈300 words)</option>
+        <option value="around 500 words">Medium (≈500 words)</option>
+        <option value="detailed, around 800 words">Detailed (≈800 words)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tone</label>
+      <select id="f-tone">
+        <option value="">Default (professional, direct, confident)</option>
+        <option value="warm and personable, still professional">Warm and personable</option>
+        <option value="formal and measured">Formal and measured</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="writer-actions">
+    <button class="btn-primary" id="draft-btn">Draft my statement</button>
+    <div class="spinner" id="draft-spinner"></div>
+  </div>
+
+  <div class="draft-out" id="draft-out"></div>
+</div>
+
+<!-- ===== Save-search modal ===== -->
+<div class="modal-backdrop" id="alert-modal">
+  <div class="modal">
+    <h3>Email me matching roles</h3>
+    <p>We'll send new roles that match this search. You can unsubscribe any time.</p>
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" id="alert-email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Keyword <span class="hint">optional</span></label>
+      <input type="text" id="alert-keyword" placeholder="e.g. psychiatry, acute medicine">
+    </div>
+    <div class="field">
+      <label>Location <span class="hint">optional</span></label>
+      <input type="text" id="alert-location" placeholder="e.g. London">
+    </div>
+    <div class="modal-status" id="alert-status"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="alert-cancel">Cancel</button>
+      <button class="btn-primary" id="alert-submit">Save alert</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- main tab switching ---------------- */
+  const mainTabs = document.querySelectorAll('.maintab');
+  const jobsView = document.getElementById('jobs-view');
+  const jobsSubbar = document.getElementById('jobs-subbar');
+  const jobsSearchWrap = document.getElementById('jobs-search-wrap');
+  const writerView = document.getElementById('writer-view');
+  mainTabs.forEach(t=>{
+    t.addEventListener('click', ()=>{
+      mainTabs.forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const isJobs = t.dataset.main === 'jobs';
+      jobsView.hidden = !isJobs;
+      jobsSubbar.hidden = !isJobs;
+      jobsSearchWrap.style.display = isJobs ? '' : 'none';
+      writerView.hidden = isJobs;
+    });
+  });
+
+  /* ---------------- job alerts ---------------- */
+  const regionless = true;
+  const gradeSel = document.getElementById('grade-filter');
+  const searchInput = document.getElementById('search');
+  const listEl = document.getElementById('job-list');
+  const detailSlot = document.getElementById('detail-slot');
+  const countEl = document.getElementById('result-count');
+  const sortNew = document.getElementById('sort-new');
+  const sortDeadline = document.getElementById('sort-deadline');
+  const backBtn = document.getElementById('back-btn');
+
+  let JOBS = [];
+  let state = { sort:'new', selected:null };
+
+  function daysUntil(dateStr){
+    if(!dateStr) return null;
+    const d = new Date(dateStr);
+    if(isNaN(d.getTime())) return null;
+    return Math.ceil((d - new Date()) / 86400000);
+  }
+  function isNew(job){
+    if(!job.first_seen) return false;
+    const seen = new Date(job.first_seen.replace(' ', 'T') + 'Z');
+    if(isNaN(seen.getTime())) return false;
+    return (Date.now() - seen.getTime()) < 24*3600*1000;
+  }
+  function relativeTime(dateStr){
+    if(!dateStr) return 'recently';
+    const d = new Date(dateStr.replace(' ', 'T') + 'Z');
+    if(isNaN(d.getTime())) return 'recently';
+    const mins = Math.round((Date.now() - d.getTime())/60000);
+    if(mins < 1) return 'just now';
+    if(mins < 60) return mins + ' min ago';
+    const hrs = Math.round(mins/60);
+    if(hrs < 24) return hrs + (hrs===1?' hour ago':' hours ago');
+    const days = Math.round(hrs/24);
+    return days + (days===1?' day ago':' days ago');
+  }
+
+  function populateGradeFilter(){
+    const grades = Array.from(new Set(JOBS.map(j=>j.grade).filter(Boolean))).sort();
+    gradeSel.innerHTML = '<option value="">Grade: Any</option>' + grades.map(g=>`<option value="${g}">${g}</option>`).join('');
+  }
+
+  function filtered(){
+    const q = searchInput.value.trim().toLowerCase();
+    const grade = gradeSel.value;
+    let list = JOBS.filter(j=>{
+      if(grade && j.grade!==grade) return false;
+      if(q){
+        const hay = [j.title, j.employer, j.location, j.grade].filter(Boolean).join(' ').toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    list.sort((a,b)=>{
+      if(state.sort==='new'){
+        return new Date(b.first_seen||0) - new Date(a.first_seen||0);
+      }
+      const da = daysUntil(a.closing_date), db = daysUntil(b.closing_date);
+      if(da===null && db===null) return 0;
+      if(da===null) return 1;
+      if(db===null) return -1;
+      return da - db;
+    });
+    return list;
+  }
+
+  function renderList(){
+    const list = filtered();
+    countEl.textContent = JOBS.length === 0 ? 'No jobs loaded yet' : (list.length + (list.length===1 ? ' role' : ' roles') + ' found');
+    listEl.innerHTML = '';
+
+    if(JOBS.length === 0){
+      listEl.innerHTML = `<div class="empty-state">
+        No roles have been loaded yet.<br><br>
+        Run <code>python scraper.py</code> on the server to populate <code>jobs.db</code>,
+        then refresh this page.
+      </div>`;
+      detailSlot.innerHTML = '';
+      return;
+    }
+    if(!list.length){
+      listEl.innerHTML = '<div class="empty-state">No roles match those filters.<br>Try widening your search.</div>';
+      return;
+    }
+    if(!state.selected || !list.find(j=>j.id===state.selected)) state.selected = list[0].id;
+    list.forEach(j=>{
+      const closingIn = daysUntil(j.closing_date);
+      const card = document.createElement('div');
+      card.className = 'job-card' + (j.id===state.selected ? ' selected' : '');
+      card.innerHTML = `
+        <div class="job-card-top">
+          <div class="job-title">${j.title || 'Untitled role'}</div>
+          ${isNew(j) ? '<span class="badge new">New</span>' : (closingIn!==null && closingIn<=5 ? '<span class="badge closing">Closing soon</span>' : '')}
+        </div>
+        <div class="trust">${j.employer || 'Employer not listed'}</div>
+        <div class="loc">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7.5 8-13a8 8 0 1 0-16 0c0 5.5 8 13 8 13Z"/><circle cx="12" cy="9" r="2.6"/></svg>
+          ${j.location || 'Location not listed'}${j.grade ? ' · '+j.grade : ''}
+        </div>
+        <div class="job-card-foot">
+          <span>Seen ${relativeTime(j.first_seen)}${j.closing_date ? ' · Closes '+j.closing_date : ''}</span>
+        </div>`;
+      card.addEventListener('click', ()=>{
+        state.selected = j.id;
+        document.body.setAttribute('data-view','detail');
+        renderAll();
+      });
+      listEl.appendChild(card);
+    });
+  }
+
+  function renderDetail(){
+    const j = JOBS.find(x=>x.id===state.selected);
+    if(!j){ detailSlot.innerHTML = ''; return; }
+    detailSlot.innerHTML = `
+      <div class="detail">
+        <div class="detail-head">
+          <div class="eyebrow">${j.source ? j.source.replace('_',' ').toUpperCase() : ''} · Seen ${relativeTime(j.first_seen)}</div>
+          <h2>${j.title || 'Untitled role'}</h2>
+          <div class="meta">
+            <span>🏥 ${j.employer || 'Employer not listed'}</span>
+            <span>📍 ${j.location || 'Location not listed'}</span>
+            ${j.salary ? `<span>💷 ${j.salary}</span>` : ''}
+            ${j.closing_date ? `<span>Apply before <b class="mono">&nbsp;${j.closing_date}</b></span>` : ''}
+          </div>
+          <div class="detail-actions">
+            ${j.url ? `<a class="btn-primary" href="${j.url}" target="_blank" rel="noopener">Apply now ↗</a>` : ''}
+            <button class="btn-ghost ai" id="detail-ai-btn">✦ Draft a supporting statement</button>
+          </div>
+        </div>
+        <div class="tab-panel">
+          <p>Career Pro's scraper found this listing on ${j.source || 'an NHS recruitment site'}. For the full job description, person specification and how to apply, open the original listing above.</p>
+          <div class="note">Job description text isn't pulled into this app — open the listing to copy the advert and person specification into the statement writer.</div>
+        </div>
+      </div>`;
+    const aiBtn = document.getElementById('detail-ai-btn');
+    if(aiBtn){
+      aiBtn.addEventListener('click', ()=>{
+        document.querySelector('.maintab[data-main="writer"]').click();
+        const prefill = `${j.title || ''} — ${j.employer || ''}, ${j.location || ''}${j.grade ? ' ('+j.grade+')' : ''}\nSource listing: ${j.url || '(not available)'}\n\n[Paste the full advert text from the listing above]`;
+        const advertField = document.getElementById('f-advert');
+        if(!advertField.value.trim()) advertField.value = prefill;
+      });
+    }
+  }
+
+  function renderAll(){ renderList(); renderDetail(); }
+
+  async function loadJobs(){
+    try{
+      const res = await fetch('/api/jobs');
+      JOBS = await res.json();
+    }catch(e){
+      JOBS = [];
+      countEl.textContent = 'Could not load jobs';
+    }
+    populateGradeFilter();
+    renderAll();
+  }
+
+  gradeSel.addEventListener('change', renderAll);
+  searchInput.addEventListener('input', renderAll);
+  sortNew.addEventListener('click', ()=>{ state.sort='new'; sortNew.classList.add('active'); sortDeadline.classList.remove('active'); renderAll(); });
+  sortDeadline.addEventListener('click', ()=>{ state.sort='deadline'; sortDeadline.classList.add('active'); sortNew.classList.remove('active'); renderAll(); });
+  backBtn.addEventListener('click', ()=>{ document.body.setAttribute('data-view','list'); });
+
+  function syncView(){
+    if(window.innerWidth>860){ document.body.removeAttribute('data-view'); }
+    else if(!document.body.getAttribute('data-view')){ document.body.setAttribute('data-view','list'); }
+  }
+  window.addEventListener('resize', syncView);
+  syncView();
+  loadJobs();
+
+  /* ---------------- save-search modal ---------------- */
+  const alertModal = document.getElementById('alert-modal');
+  const alertStatus = document.getElementById('alert-status');
+  document.getElementById('open-alert-modal').addEventListener('click', ()=>{
+    document.getElementById('alert-keyword').value = searchInput.value.trim();
+    document.getElementById('alert-location').value = '';
+    alertStatus.style.display = 'none';
+    alertModal.classList.add('open');
+  });
+  document.getElementById('alert-cancel').addEventListener('click', ()=> alertModal.classList.remove('open'));
+  alertModal.addEventListener('click', (e)=>{ if(e.target===alertModal) alertModal.classList.remove('open'); });
+
+  document.getElementById('alert-submit').addEventListener('click', async ()=>{
+    const email = document.getElementById('alert-email').value.trim();
+    const keyword = document.getElementById('alert-keyword').value.trim();
+    const location = document.getElementById('alert-location').value.trim();
+    const grade = gradeSel.value;
+    if(!email){
+      alertStatus.textContent = 'Please enter an email address.';
+      alertStatus.className = 'modal-status err';
+      alertStatus.style.display = 'block';
+      return;
+    }
+    try{
+      const res = await fetch('/api/alerts', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email, keyword, location, grade})
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Could not save alert.');
+      alertStatus.textContent = 'Saved — you\'ll get an email when a matching role appears.';
+      alertStatus.className = 'modal-status ok';
+      alertStatus.style.display = 'block';
+      setTimeout(()=> alertModal.classList.remove('open'), 1400);
+    }catch(e){
+      alertStatus.textContent = e.message;
+      alertStatus.className = 'modal-status err';
+      alertStatus.style.display = 'block';
+    }
+  });
+
+  /* ---------------- statement writer ---------------- */
+  const draftBtn = document.getElementById('draft-btn');
+  const draftSpinner = document.getElementById('draft-spinner');
+  const draftOut = document.getElementById('draft-out');
+
+  draftBtn.addEventListener('click', async ()=>{
+    const advert = document.getElementById('f-advert').value.trim();
+    const spec = document.getElementById('f-spec').value.trim();
+    const tracapp = document.getElementById('f-tracapp').value.trim();
+    const experience = document.getElementById('f-experience').value.trim();
+    const length = document.getElementById('f-length').value;
+    const tone = document.getElementById('f-tone').value;
+
+    if(!advert || !(tracapp || experience)){
+      draftOut.textContent = 'Please provide the job advert plus your Trac application content or additional notes.';
+      draftOut.className = 'draft-out error';
+      draftOut.style.display = 'block';
+      return;
+    }
+
+    draftBtn.disabled = true;
+    draftSpinner.style.display = 'inline-block';
+    draftOut.style.display = 'none';
+
+    try{
+      const res = await fetch('/api/draft-statement', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({advert, spec, tracapp, experience, length, tone})
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Something went wrong drafting your statement.');
+      draftOut.textContent = data.draft;
+      draftOut.className = 'draft-out';
+      draftOut.style.display = 'block';
+    }catch(e){
+      draftOut.textContent = e.message;
+      draftOut.className = 'draft-out error';
+      draftOut.style.display = 'block';
+    }finally{
+      draftBtn.disabled = false;
+      draftSpinner.style.display = 'none';
+    }
+  });
+
+  /* ---------------- PWA install + service worker ---------------- */
+  let deferredPrompt = null;
+  const installBtn = document.getElementById('install-btn');
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-flex';
+  });
+  installBtn.addEventListener('click', async ()=>{
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('/static/sw.js').catch(()=>{});
+    });
+  }
+})();
+</script>
+</body>
+</html>
