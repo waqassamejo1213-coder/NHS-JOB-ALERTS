@@ -2,18 +2,23 @@
 app.py — Flask backend for the combined PWA (job alerts + AI statement writer).
 
 Routes:
-    GET  /                     -> the app shell (index.html)
-    GET  /static/<path>        -> manifest, service worker, icons
-    GET  /api/jobs             -> JSON list of recently scraped jobs
-    POST /api/alerts           -> save a new email alert filter
-    POST /api/draft-statement  -> proxies to the Anthropic API server-side
-                                   (keeps your API key private — never sent
-                                   to the browser)
+  GET  /                      -> the app shell (index.html)
+  GET  /static/<path>         -> manifest, service worker, icons
+  GET  /api/jobs               -> JSON list of recently scraped jobs
+  POST /api/alerts             -> save a new email alert filter
+  POST /api/draft-statement    -> proxies to the Anthropic API server-side
+                                    (keeps your API key private — never sent
+                                     to the browser)
+  POST /api/admin/run-scraper  -> runs scraper.py's scrape cycle on demand,
+                                    for hosts (like Render's free tier) with
+                                    no shell/cron access. Requires the
+                                    X-Admin-Token header to match
+                                    ADMIN_SCRAPER_TOKEN in your environment.
 
 Run:
-    cp .env.example .env          # fill in ANTHROPIC_API_KEY and SMTP details
-    pip install -r requirements.txt
-    flask --app app run --debug
+  cp .env.example .env   # fill in ANTHROPIC_API_KEY and SMTP details
+  pip install -r requirements.txt
+  flask --app app run --debug
 """
 import os
 import requests
@@ -28,23 +33,31 @@ init_db()
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+ADMIN_SCRAPER_TOKEN = os.getenv("ADMIN_SCRAPER_TOKEN")
 
+DEFAULT_SCRAPE_KEYWORDS = [
+    "psychiatry",
+    "clinical fellow",
+    "specialty doctor",
+    "trust registrar",
+    "acute medicine",
+    "emergency medicine",
+    "paediatrics",
+    "general surgery",
+]
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-
 @app.route("/static/<path:filename>")
 def static_files(filename):
     return send_from_directory("static", filename)
-
 
 @app.route("/api/jobs")
 def api_jobs():
     jobs = get_recent_jobs(limit=100)
     return jsonify(jobs)
-
 
 @app.route("/api/alerts", methods=["POST"])
 def api_alerts():
@@ -61,6 +74,38 @@ def api_alerts():
     )
     return jsonify({"status": "ok"})
 
+@app.route("/api/admin/run-scraper", methods=["POST"])
+def api_run_scraper():
+    """
+    Manually triggers one scrape cycle over HTTP. This exists because
+    free-tier hosts (e.g. Render's free web service plan) don't offer a
+    shell, SSH, or cron jobs to run scraper.py directly on the server.
+
+    Protect this: set ADMIN_SCRAPER_TOKEN in your environment to a long
+    random value and send it back as the X-Admin-Token header. If the
+    variable isn't set, this endpoint refuses all requests.
+    """
+    if not ADMIN_SCRAPER_TOKEN:
+        return jsonify({"error": "ADMIN_SCRAPER_TOKEN is not set on the server — this endpoint is disabled."}), 403
+    if request.headers.get("X-Admin-Token") != ADMIN_SCRAPER_TOKEN:
+        return jsonify({"error": "unauthorized"}), 403
+
+    from scraper import run_scrape_cycle
+
+    data = request.get_json(silent=True) or {}
+    keywords = data.get("keywords") or DEFAULT_SCRAPE_KEYWORDS
+
+    try:
+        new_jobs = run_scrape_cycle(keywords)
+    except Exception as e:
+        return jsonify({"error": f"scrape failed: {e}"}), 500
+
+    return jsonify({
+        "status": "ok",
+        "keywords_used": keywords,
+        "new_jobs_found": len(new_jobs),
+        "titles": [j["title"] for j in new_jobs][:50],
+    })
 
 @app.route("/api/draft-statement", methods=["POST"])
 def api_draft_statement():
@@ -132,7 +177,6 @@ Output ONLY the supporting statement text, no preamble or notes."""
         return jsonify({"draft": draft})
     except requests.RequestException as e:
         return jsonify({"error": f"AI request failed: {e}"}), 502
-
 
 if __name__ == "__main__":
     app.run(debug=True)
